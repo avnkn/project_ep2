@@ -1,62 +1,123 @@
 import java.io.*;
+import java.util.Scanner;
+import java.util.Arrays;
 
 public class evaluatorDifferences {
-    public static String rv = ",";
+    public static String rv = ";";
     public static String rs = "\n";
+    public static String fileName = "evaluatorDifferences.csv";
 
     public static void main(String[] args) {
         try {
-            FileInputStream fstream1 = new FileInputStream("test/Main1.txt");
-            FileInputStream fstream2 = new FileInputStream("test/Main2.txt");
-            BufferedReader br1 = new BufferedReader(new InputStreamReader(fstream1));
-            BufferedReader br2 = new BufferedReader(new InputStreamReader(fstream2));
-            String strLine1;
-            String strLine2;
+            System.out.println("Введите количество сравниваемых файлов");
+            int n = setIntInput();
 
-            String[] LineCsv;
-            LineCsv = new String[3];
-            LineCsv[0] = "Номер строки";
-            LineCsv[1] = "Файл1";
-            LineCsv[2] = "Файл2";
+            BufferedReader files[] = setArrayFiles(n);
+            String csv = diffFiles(files);
 
-            PrintWriter pw = new PrintWriter(new File("test.csv"));
-            StringBuilder sb = new StringBuilder();
-            appendLine(sb, LineCsv);
-
-            int i = 1;
-            while (i++ > 0 && (strLine1 = br1.readLine()) != null && (strLine2 = br2.readLine()) !=null) {
-                if (!strLine1.equals(strLine2)) {
-                    LineCsv[0] = Integer.toString(i);
-                    LineCsv[1] = strLine1;
-                    LineCsv[2] = strLine2;
-                    appendLine(sb, LineCsv);
-                }
-            }
-            while (i++ > 0 && (strLine1 = br1.readLine()) != null ) {
-                LineCsv[0] = Integer.toString(i);
-                LineCsv[1] = strLine1;
-                LineCsv[2] = "";
-                appendLine(sb, LineCsv);
-            }
-            while (i++ > 0 && (strLine2 = br2.readLine()) != null ) {
-                LineCsv[0] = Integer.toString(i);
-                LineCsv[1] = "";
-                LineCsv[2] = strLine2;
-                appendLine(sb, LineCsv);
-            }
-            pw.write(sb.toString());
+            PrintWriter pw = new PrintWriter(new File(fileName));
+            pw.write(csv);
             pw.close();
-            System.out.println("done!");
-
+            System.out.println("готово, смотри файл - " + fileName);
         } catch (IOException e) {
             System.out.println("Ошибка");
+            System.exit(0);
         }
+
+    }
+
+    public static int setIntInput() {
+        int m;
+        Scanner in = new Scanner(System.in);
+        for (int i=0; true; i++) {
+            if (in.hasNextInt()) {
+                m = in.nextInt();
+                break;
+            } else {
+                in.next();
+                System.out.println("Ошибка, введите число");
+            }
+        }
+        return m;
+    }
+
+    public static BufferedReader[] setArrayFiles (int n) {
+        BufferedReader files[] = new BufferedReader[n];
+        Scanner in = new Scanner(System.in);
+        String name;
+        int i=0;
+        while (i < n) {
+            System.out.println("Введите название файла для сравнения №" + Integer.toString(i+1));
+            try {
+                name = in.next();
+                BufferedReader file = new BufferedReader(new InputStreamReader(new FileInputStream(name)));
+                files[i] = file;
+                i++;
+            } catch (IOException e) {
+                System.out.println("Ошибка загрузки файла");
+            }
+        }
+        return files;
+    }
+
+    public static String diffFiles(BufferedReader[] files) {
+        String[] lineCsv;
+        String str;
+        StringBuilder sb = new StringBuilder();
+        lineCsv = new String[files.length];
+
+        try {
+            sb.append("Номер строки" + rv);
+            for (int i=0; i<files.length; i++) {
+                lineCsv[i] = "Файл " + Integer.toString(i+1);
+            }
+            appendLine(sb, lineCsv);
+
+            int nStr = 0;
+            while (++nStr > 0) {
+                for (int i=0; i<files.length; i++) {
+                    lineCsv[i] =files[i].readLine();
+                }
+                if (checkNullLines(lineCsv)) {
+                    break;
+                }
+                if (diffLines(lineCsv)) {
+                    sb.append(Integer.toString(nStr) + rv);
+                    appendLine(sb, lineCsv);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Ошибка");
+            System.exit(0);
+        }
+        return sb.toString();
+    }
+
+    public static boolean diffLines(String[] lineCsv) {
+        int flag = 0;
+        String str1 = lineCsv[0] != null ? lineCsv[0] : "";
+        for (int i=1; i< lineCsv.length; i++) {
+            if (!str1.equals(lineCsv[i])) {
+                flag = 1;
+                break;
+            }
+        }
+        return flag == 1;
+    }
+
+    public static boolean checkNullLines(String[] lineCsv) {
+        int flag = 0;
+        for (int i=0; i< lineCsv.length; i++) {
+            if (lineCsv[i] !=null) {
+                flag = 1;
+                break;
+            }
+        }
+        return flag == 0;
     }
 
     public static void appendLine(StringBuilder sb, String[] arr) {
-        for (int i =0; i< arr.length; i++) {
-            sb.append(arr[i] + rv);
-        }
+        sb.append(String.join(rv, arr));
         sb.append(rs);
     }
 }

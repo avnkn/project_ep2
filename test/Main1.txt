@@ -1,15 +1,15 @@
-import java.util.Scanner;
-import java.util.Arrays;
+import java.util.Scanner
+import java.util.Arrays
 
 public class Main {
     public static void main(String[] args) {
-        int initialSizeArray = 5;
-        int[] nums = setArrayInput(initialSizeArray);
+        int initialSizeArray = 5
+        int[] nums = setArrayInput(initialSizeArray)
 
-        System.out.println("Получившейся массив:");
-        printArray(nums);
+        System.out.println("Получившейся массив:")
+        printArray(nums)
 
-        System.out.println("Какое число вы хотите удалить в данном массиве?");
-        int m = setIntInput();
+        System.out.println("Какое число вы хотите удалить в данном массиве?")
+        int m = setIntInput()
     }
 }

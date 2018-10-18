@@ -14,4 +14,4 @@ public class Main {
         int m = setIntInput()
 
     }
-}
+}}
